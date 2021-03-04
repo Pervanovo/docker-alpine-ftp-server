@@ -1,5 +1,13 @@
 #!/bin/sh
 
+if [ $CHROOT_LOCAL_USER ]; then
+  echo "chroot_local_user=YES" >> $VSFTP_CONF
+fi
+
+if [ $ALLOW_WRITEABLE_CHROOT ]; then
+  echo "allow_writeable_chroot=YES" >> $VSFTP_CONF
+fi
+
 #Remove all ftp users
 grep '/ftp/' /etc/passwd | cut -d':' -f1 | xargs -n1 deluser
 
@@ -35,6 +43,9 @@ for i in $USERS ; do
   echo -e "$PASS\n$PASS" | adduser -h $FOLDER -s /sbin/nologin $UID_OPT $NAME
   mkdir -p $FOLDER
   chown $NAME:$NAME $FOLDER
+  if [ $CHROOT_LOCAL_USER ] && [ ! $ALLOW_WRITEABLE_CHROOT ]; then
+    chmod a-w $FOLDER
+  fi
   unset NAME PASS FOLDER UID
 done
 
@@ -55,6 +66,6 @@ fi
 if [ ! -z "$1" ]; then
   exec "$@"
 else
-  exec /usr/sbin/vsftpd -opasv_min_port=$MIN_PORT -opasv_max_port=$MAX_PORT $ADDR_OPT /etc/vsftpd/vsftpd.conf
+  exec /usr/sbin/vsftpd -opasv_min_port=$MIN_PORT -opasv_max_port=$MAX_PORT $ADDR_OPT $VSFTP_CONF
 fi
 

@@ -9,6 +9,8 @@ docker run -d \
     -p 21000-21010:21000-21010 \
     -e USERS="one|1234" \
     -e ADDRESS=ftp.site.domain \
+    -e CHROOT_LOCAL_USER=1
+    -e ALLOW_WRITEABLE_CHROOT=1
     delfer/alpine-ftp-server
 ```
 
@@ -17,6 +19,8 @@ docker run -d \
 Environment variables:
 - `USERS` - space and `|` separated list (optional, default: `ftp|alpineftp`)
   - format `name1|password1|[folder1][|uid1] name2|password2|[folder2][|uid2]`
+- `CHROOT_LOCAL_USER` - set to non-empty string to set `chroot_local_user=YES` in vsftpd.conf
+- `ALLOW_WRITEABLE_CHROOT` - set to non-empty string to set `allow_writeable_chroot=YES` in vsftp.conf
 - `ADDRESS` - external address witch clients can connect passive ports (optional)
 - `MIN_PORT` - minimum port number to be used for passive connections (optional, default `21000`)
 - `MAX_PORT` - maximum port number to be used for passive connections (optional, default `21010`)
